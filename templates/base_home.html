@@ -1,0 +1,28 @@
+{% extends "base.html" %}
+
+{% load pages_tags mezzanine_tags i18n staticfiles site_extras %}
+{% block meta_title %}
+Inova Support Site
+{%endblock%}
+<!-- Main content of the page-->
+{% block main %}
+	{{ block.super }}
+		{% if page %}
+            <p>{{page.first.richtextpage.content|richtext_filters|safe}}</p>
+		{% else %}
+			<p>Here you will be able to
+                <ul>
+                    <li>Search journals for geologic terms/li>
+                    <li>Export data from said searches</li>
+                    <li>Determine proximity of geologic terms in journal content.</li>
+                </ul>
+            </p>
+		{% endif %}
+	{% endblock %}
+
+	{%block gone%}
+
+{%endblock%}
+{%block sideBar%}
+    {{block.super}}
+{% endblock %}
