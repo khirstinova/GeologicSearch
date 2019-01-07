@@ -1,0 +1,54 @@
+{% extends "base.html" %}
+{% load i18n mezzanine_tags %}
+
+{% block meta_title %}{{ title }}{% endblock %}
+{% block title %}{{ title }}{% endblock %}
+{% block body_id %}account{% endblock %}
+
+
+{{ block.super }}
+
+{% block main %}
+<h1>{{ title }}</h1>
+{% errors_for form %}
+<form class="form-horizontal" method="post"{% if form.is_multipart %} enctype="multipart/form-data"{% endif %}>
+    {% csrf_token %}
+    {%for field in form%}
+        {% if field.label != 'Phone' and field.label != 'Job title' and field.label != 'Company' and field.label != 'Primary interest' and field.label != 'KB Weekly Email' and field.label != 'KB Daily Email'%}
+        <div class="form-group">
+            <label for="{{field.id_for_label}}" class="col-sm-2 control-label"><br />{{field.label}}</label>
+            {{field.errors}}
+            <div class="col-sm-8">
+                {{field}}
+            </div>
+        </div>
+        {% endif %}
+    {%endfor%}
+    {% if request.user.is_staff %}
+        <hr/><h2>{{ subscription_title }}</h2>
+        <p>Select frequency below to receive email notifications for new and updated questions and responses in the Knowledge Base.</p>
+        {%for field in form%}
+            {% if field.label == 'KB Weekly Email' or field.label == 'KB Daily Email' %}
+            <div class="form-group" style="line-height: 3px;">
+                {{field.errors}}
+                <label for="{{field.id_for_label}}" class="col-sm-2 control-label"><br />{{field.label}}</label>
+                <div class="col-sm-8" style="width: 10%;vertical-align: middle;">
+                    {{field}}
+                </div>
+            </div>
+            {% endif %}
+        {%endfor%}
+    {% endif %}
+    <div class="form-actions">
+        {% block account_form_actions %}
+        <input class="btn btn-primary btn-lg pull-right" type="submit" value="{{ title }}">
+        {% endblock %}
+    </div>
+</form>
+
+{% block forgot_password %}{% endblock %}
+
+{% endblock %}
+{% block sideBar %}
+{{ block.super }}
+{% endblock %}

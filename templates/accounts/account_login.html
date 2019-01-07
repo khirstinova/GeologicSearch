@@ -1,0 +1,14 @@
+{% extends "accounts/account_form.html" %}
+{% load i18n %}
+
+{% block main %}
+
+{% if request.user.is_authenticated %}
+    <p>{% trans "You may be trying to view a page you do not have permissions for." %}</p>
+    <p>{% trans "You're already logged in. If you'd like to log in as a different user, you'll need to log out first." %}</p>
+{% else %}
+    {{ block.super }}
+
+{% endif %}
+
+{% endblock %}

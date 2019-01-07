@@ -10,3 +10,4 @@ static/media/*
 mydatabase
 wsgi.py
 support_site*/
+db.sqlite3

@@ -70,15 +70,34 @@ ROOT_URLCONF = 'urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [],
-        'APP_DIRS': True,
+        'DIRS': [
+            # Put strings here, like "/home/html/django_templates"
+            # or "C:/www/django/templates".
+            # Always use forward slashes, even on Windows.
+            # Don't forget to use absolute paths, not relative paths.
+            os.path.join(PROJECT_ROOT, "templates")
+        ],
         'OPTIONS': {
+            'builtins': ['mezzanine.template.loader_tags'],
             'context_processors': [
-                'django.template.context_processors.debug',
-                'django.template.context_processors.request',
+                # Insert your TEMPLATE_CONTEXT_PROCESSORS here or use this
+                # list if you haven't customized them:
                 'django.contrib.auth.context_processors.auth',
+                'django.template.context_processors.debug',
+                'django.template.context_processors.i18n',
+                'django.template.context_processors.media',
+                'django.template.context_processors.static',
+                'django.template.context_processors.tz',
                 'django.contrib.messages.context_processors.messages',
+                "django.template.context_processors.request",
+                "mezzanine.conf.context_processors.settings",
+                # this context_processor requires Mezzanine 3.1.5 but I had odd issues upgrading to that version so disabling for now - this comment is actually dead now? <SJH>
+                "mezzanine.pages.context_processors.page",
             ],
+            'loaders': [
+                "django.template.loaders.filesystem.Loader",
+                "django.template.loaders.app_directories.Loader",
+            ]
         },
     },
 ]
@@ -148,3 +167,5 @@ SESSION_COOKIE_SECURE = False
 CSRF_COOKIE_SECURE = False
 
 TESTING = False
+
+GRAPPELLI_INSTALLED = False
