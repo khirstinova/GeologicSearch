@@ -1,4 +1,4 @@
-"""geologic_search URL Configuration
+"""bioerosion_search URL Configuration
 
 The `urlpatterns` list routes URLs to views. For more information please see:
     https://docs.djangoproject.com/en/2.1/topics/http/urls/
@@ -21,4 +21,5 @@ urlpatterns = [
     url(r'^$', home_view, name="home"),
     url("^admin/", include(admin.site.urls)),
     url(r'^accounts/login/$', login),
+    url(r'^search/', include('bioerosion_search.urls', namespace="bioerosion_search")),
 ]

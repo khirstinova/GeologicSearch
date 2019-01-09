@@ -1,6 +1,6 @@
 {% extends "base.html" %}
 
-{% load pages_tags mezzanine_tags i18n staticfiles site_extras %}
+{% load pages_tags mezzanine_tags i18n staticfiles %}
 {% block meta_title %}
 Inova Support Site
 {%endblock%}
@@ -10,13 +10,23 @@ Inova Support Site
 		{% if page %}
             <p>{{page.first.richtextpage.content|richtext_filters|safe}}</p>
 		{% else %}
-			<p>Here you will be able to
-                <ul>
-                    <li>Search journals for geologic terms/li>
-                    <li>Export data from said searches</li>
-                    <li>Determine proximity of geologic terms in journal content.</li>
-                </ul>
-            </p>
+            <div class="row fullscreen align-items-center justify-content-between">
+                <div class="col-lg-6 col-md-6 banner-left">
+                    <h4>Welcome to Bioerosion TDM</h4>
+                    <p>Here you will be able to
+                        <ul>
+                            <li>Search journals for geologic terms</li>
+                            <li>Export data from said searches</li>
+                            <li>Determine proximity of geologic terms in journal content.</li>
+                        </ul>
+                    </p>
+                    <a href="#" class="primary-btn text-uppercase">Search now</a>
+                </div>
+                <div class="col-lg-6 col-md-6 banner-right d-flex align-self-end">
+                    <img class="img-fluid" src="{% static 'img/bioerosion.png' %}" alt="">
+                </div>
+            </div>
+
 		{% endif %}
 	{% endblock %}
 

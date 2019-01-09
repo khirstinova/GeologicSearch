@@ -2,12 +2,12 @@
 from django.contrib.auth.decorators import login_required
 from mezzanine.accounts.views import login as builtin_login
 from mezzanine.pages.models import Page
-from view_checks import render_geologic_page
+from view_checks import render_bioerosion_page
 
 @login_required
 def home_view(request):
     page = Page.objects.filter(title="Geologic Search Home Page")
-    return render_geologic_page(request, 'base_home.html', {} if page is None else {'page': page})
+    return render_bioerosion_page(request, 'base_home.html', {} if page is None else {'page': page})
 
 def login(request, *args, **kwargs):
     response = builtin_login(request, *args, **kwargs)

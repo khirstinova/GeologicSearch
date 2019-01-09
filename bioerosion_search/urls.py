@@ -1,6 +1,6 @@
 #the product app urls page
 from django.conf.urls import url
-from geologic_search import views
+from bioerosion_search import views
 
 urlpatterns = [
 
