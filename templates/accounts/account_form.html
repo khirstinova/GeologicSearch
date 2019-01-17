@@ -28,18 +28,17 @@
     {%endfor%}
     <div class="form-actions">
         {% block account_form_actions %}
-        <input class="btn btn-primary btn-lg pull-right" type="submit" value="{{ title }}">
+        <input class="btn btn-primary btn-lg" type="submit" value="{{ title }}">
         {% endblock %}
     </div>
 </form>
 
 {% block forgot_password %}
+    <br />
     {% url "our-signup" as signup_url %}
-
-    <p>{% blocktrans with request.GET.next as next %}If you don't have an account you can <a href="{{ signup_url }}?next={{ next }}"><strong>sign up</strong></a> for one now.{% endblocktrans %}</p>
     {% url "mezzanine_password_reset" as password_reset_url %}
     {% url "profile_update" as profile_update_url %}
-    {% blocktrans %}<p>You can also <a href="{{ password_reset_url }}?next={{ profile_update_url }}"><strong>reset your password</strong></a> if you've forgotten it.</p>{% endblocktrans %}</p>
+    {% blocktrans %}<p>You can <a href="{{ password_reset_url }}?next={{ profile_update_url }}"><strong>reset your password</strong></a> if you've forgotten it.</p>{% endblocktrans %}</p>
 
 {% endblock %}
 

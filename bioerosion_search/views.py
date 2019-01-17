@@ -6,4 +6,4 @@ logger = logging.getLogger(__name__)
 
 @login_required
 def index(request):
-    return render_bioerosion_page(request, 'base_home.html')
+    return render_bioerosion_page(request, 'search/search.html')
