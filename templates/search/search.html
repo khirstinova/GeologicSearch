@@ -5,7 +5,7 @@
     Bioerosion TDM Search
 {%endblock%}
 {% block extra_js %}
-<script src="{% static 'js/search.js' %}"></script><!-- should we serve this from our server? -->
+<script src="{% static 'js/search.js' %}" xmlns="http://www.w3.org/1999/html"></script><!-- should we serve this from our server? -->
 {% endblock %}
 <!-- Main content of the page-->
 {% block main %}
@@ -14,19 +14,59 @@
             <p>{{page.first.richtextpage.content|richtext_filters|safe}}</p>
 		{% else %}
             <div class="row fullscreen align-items-center justify-content-between">
-                <div class="col-lg-6 col-md-6 banner-left">
+                <div class="col-lg-6 col-md-6 banner-left search-form-container">
                     <form class="form-horizontal" method="post"{% if form.is_multipart %} enctype="multipart/form-data"{% endif %}>
                         <p>Terms</p>
-                        <p><input type="text" name="search_1" /> <button data-next="2">Add 2nd Term</button></p>
-                        <p class="search_2"><input type="text" name="search_2" /> <button data-next="3">Add 3rd Term</button></p>
-                        <p class="search_3"><input type="text" name="search_3" /></p>
-                        <p><input type="text" name="proximity" size="3" /> <label for="proximity">Proximity</label></p>
+                        <p class="search_1">
+                            <input type="text" name="search_1" />
+                            <button data-next="2">Add Term</button>
+                        </p>
+                        <p class="search_2">
+                            <input type="text" name="search_2" />
+                            <button data-next="3">Add Term</button>
+                            <span class="close">x</span>
+                        </p>
+                        <p class="search_3">
+                            <input type="text" name="search_3" />
+                            <span class="close">x</span>
+                        </p>
+                        <p><select name="proximity" class="">
+                            <option value="0">None</option>
+                            <option value="1">Next Word/Phrase</option>
+                            <option value="2">Same Sentence</option>
+                            <option value="3">Same Paragraph</option>
+                        </select> <label for="proximity">Proximity</label></p>
                         <p><input type="checkbox" name="proximity_exp" /> <label for="proximity_exp">Expand proximity</label></p>
-                        <p><a href="#" class="primary-btn text-uppercase">Search</a></p>
+                        <p><a href="#" id="search-btn" class="primary-btn text-uppercase">Search</a></p>
                     </form>
                 </div>
-                <div class="col-lg-6 col-md-6 banner-right d-flex align-self-end">
-                    <div class="search-results"></div>
+                <div class="col-lg-6 col-md-6 banner-right d-flex">
+                    <div class="search-results-container">
+                        <div class="search-results-table">
+                            <div class="search-results-list">
+                                <h3>Results</h3>
+                                <p>3 journals totaling 38 results</p>
+                                <div class="search-results-item">
+                                    <p><img src="{% static 'img/journal-icon.jpg' %}"/>
+                                        <a href="#">Geosphere - 25 result(s)</a>
+                                    </p>
+                                </div>
+                                <div class="search-results-item">
+                                    <p><img src="{% static 'img/journal-icon.jpg' %}"/>
+                                        <a href="#">Geology - 12 result(s)</a>
+                                    </p>
+                                </div>
+                                <div class="search-results-item">
+                                    <p><img src="{% static 'img/journal-icon.jpg' %}"/>
+                                        <a href="#">Economic Geology - 1 result(s)</a>
+                                    </p>
+                                </div>
+                            </div>
+                            <div class="search-wait">
+                                <img src="{% static 'img/Loading_icon.gif' %}" />
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
 
