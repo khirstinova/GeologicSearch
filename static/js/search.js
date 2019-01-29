@@ -19,7 +19,7 @@ $(document).ready(
                 $('.search-results-container').show();
                 setTimeout(function () {
                     $('.search-wait').hide();
-                    $('.search-results-list').show();
+                    $('.search-results-list-journals').show();
                 }, 10000);
             }
         );
@@ -31,6 +31,11 @@ $(document).ready(
             $('button[data-next=' + number + ']').prop("disabled", false);
             $('.search_' + (number - 1)).find('.close').show();
             p.hide();
+        });
+
+        $('.search-results-item-journal a').click(function() {
+            $('.search-results-list-journals').hide();
+            $('.search-results-list-articles').show();
         });
     }
 );

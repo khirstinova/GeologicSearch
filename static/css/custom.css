@@ -48,17 +48,17 @@ p.search_3 {
     width: 100%;
 }
 
-.search-results-list {
+.search-results-list-journals {
     display: none;
     width: 100%;
 }
 
-.search-results-list h3 {
+.search-results-list-journals h3 {
     margin-bottom: 10px;
     margin-top: 10px;
 }
 
-.search-results-item {
+.search-results-item-journal {
     border: 1px solid #ddd;
     border-radius: 3px;
     margin: 10px;
@@ -66,3 +66,29 @@ p.search_3 {
     text-align: left;
 }
 
+span.journal-title {
+    font-style: italic;
+}
+
+.search-results-list-articles {
+    display: none;
+    width: 100%;
+}
+
+.search-results-item-article {
+    border: 1px solid #ddd;
+    border-radius: 3px;
+    margin: 10px;
+    padding: 10px;
+    text-align: left;
+}
+
+.article-icon {
+    display: inline-block;
+    vertical-align: top;
+}
+
+.article-listing {
+    display: inline-block;
+    padding-left: 8px;
+}

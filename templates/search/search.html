@@ -16,6 +16,8 @@
             <div class="row fullscreen align-items-center justify-content-between">
                 <div class="col-lg-6 col-md-6 banner-left search-form-container">
                     <form class="form-horizontal" method="post"{% if form.is_multipart %} enctype="multipart/form-data"{% endif %}>
+                        <h3>Search</h3>
+                        <p>&nbsp;</p>
                         <p>Terms</p>
                         <p class="search_1">
                             <input type="text" name="search_1" />
@@ -43,23 +45,51 @@
                 <div class="col-lg-6 col-md-6 banner-right d-flex">
                     <div class="search-results-container">
                         <div class="search-results-table">
-                            <div class="search-results-list">
+                            <div class="search-results-list-journals">
                                 <h3>Results</h3>
                                 <p>3 journals totaling 38 results</p>
-                                <div class="search-results-item">
+                                <div class="search-results-item-journal">
                                     <p><img src="{% static 'img/journal-icon.jpg' %}"/>
                                         <a href="#">Geosphere - 25 result(s)</a>
                                     </p>
                                 </div>
-                                <div class="search-results-item">
+                                <div class="search-results-item-journal">
                                     <p><img src="{% static 'img/journal-icon.jpg' %}"/>
                                         <a href="#">Geology - 12 result(s)</a>
                                     </p>
                                 </div>
-                                <div class="search-results-item">
+                                <div class="search-results-item-journal">
                                     <p><img src="{% static 'img/journal-icon.jpg' %}"/>
                                         <a href="#">Economic Geology - 1 result(s)</a>
                                     </p>
+                                </div>
+                            </div>
+                            <div class="search-results-list-articles">
+                                <div class="search-results-item-article">
+                                    <div class="article-icon">
+                                        <img class="article-icon" src="{% static 'img/article-icon.png' %}"/>
+                                    </div>
+                                    <div class="article-listing">
+                                        <p>Title: My Time in Prague</p>
+                                        <p>Journal: Geosphere</p>
+                                        <p>doi:10.1037/rmh0000008</p>
+                                        <p>Hirst, K.R. (2017). My Time in Prague.
+                                            <span class="journal-title">Geosphere</span>, 27(3), 561-569</p>
+                                        <p>50 incidences</p>
+                                    </div>
+                                </div>
+                                <div class="search-results-item-article">
+                                    <div class="article-icon">
+                                        <img class="article-icon" src="{% static 'img/article-icon.png' %}"/>
+                                    </div>
+                                    <div class="article-listing">
+                                        <p>Title: New Wave Expose</p>
+                                        <p>Journal: Geology</p>
+                                        <p>doi:10.1037/arc0000014</p>
+                                        <p>Hirst, K.R. (1998). New Wave Expose.
+                                            <span class="journal-title">Geology</span>, 21(2), 100-103</p>
+                                        <p>20 incidences</p>
+                                    </div>
                                 </div>
                             </div>
                             <div class="search-wait">
