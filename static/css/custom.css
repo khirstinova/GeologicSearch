@@ -8,22 +8,21 @@ label.col-sm-2 {
 
 .search-form-container select {
     display: inline;
+    margin-left: 8px;
 }
 
 .search-form-container p {
     max-width: 340px;
 }
 
-p.search_2 {
+p.search_1, p.search_2, p.search_3 {
     background-color: #eee;
-    display: none;
     padding: 8px;
 }
 
-p.search_3 {
-    background-color: #eee;
+p.search_2, p.search_3
+{
     display: none;
-    padding: 8px;
 }
 
 .close {
@@ -34,6 +33,10 @@ p.search_3 {
     background-color: #fff;
     box-shadow: 8px 8px 50px #ddd;
     display: none;
+}
+
+.export-search-list {
+    text-align: right;
 }
 
 .search-results-table {

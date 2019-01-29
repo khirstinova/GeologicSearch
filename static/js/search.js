@@ -16,11 +16,14 @@ $(document).ready(
         (
             function(e) {
                 e.preventDefault();
+                $('.search-results-list-journals').hide();
+                $('.search-results-list-articles').hide();
+                $('.search-wait').show();
                 $('.search-results-container').show();
                 setTimeout(function () {
                     $('.search-wait').hide();
                     $('.search-results-list-journals').show();
-                }, 10000);
+                }, 5000);
             }
         );
 
