@@ -38,7 +38,11 @@ $(document).ready(
 
         $('.search-results-item-journal a').click(function() {
             $('.search-results-list-journals').hide();
-            $('.search-results-list-articles').show();
+            $('.search-wait').show();
+            setTimeout(function () {
+                $('.search-wait').hide();
+                $('.search-results-list-articles').show();
+            }, 3000);
         });
     }
 );
