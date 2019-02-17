@@ -38,6 +38,9 @@ STATICFILES_FINDERS = (
     "django.contrib.staticfiles.finders.AppDirectoriesFinder",
 )
 
+SOLR_URL = "http://localhost:8983/solr"
+SOLR_COLLECTION = "collection1"
+
 # Application definition
 
 INSTALLED_APPS = [
