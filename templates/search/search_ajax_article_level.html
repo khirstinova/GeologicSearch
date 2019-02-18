@@ -1,33 +1,22 @@
-{% load pages_tags mezzanine_tags i18n staticfiles %}
+{% load pages_tags mezzanine_tags i18n staticfiles dict_tags %}
 
 <div class="search-results-list-articles">
     <div class="export-search-list">
         <img src="{% static 'img/export-icon.png' %}"/>
     </div>
-    <div class="search-results-item-article">
-        <div class="article-icon">
-            <img class="article-icon" src="{% static 'img/article-icon.png' %}"/>
+    {% for r in results_context.results %}
+        <div class="search-results-item-article">
+            <div class="article-icon">
+                <img class="article-icon" src="{% static 'img/article-icon.png' %}"/>
+            </div>
+            <div class="article-listing">
+                <p>Title: {{ r.title }}</p>
+                <p>Journal: {{ r.journal }}</p>
+                <p>{{ r.doi }}</p>
+                <p>{{ r.citation }}</p>
+                <p>{{ results_context|keyvalue:r.journal|keyvalue:r.title}} incidences</p>
+            </div>
         </div>
-        <div class="article-listing">
-            <p>Title: My Time in Prague</p>
-            <p>Journal: Geosphere</p>
-            <p>doi:10.1037/rmh0000008</p>
-            <p>Hirst, K.R. (2017). My Time in Prague.
-                <span class="journal-title">Geosphere</span>, 27(3), 561-569</p>
-            <p>50 incidences</p>
-        </div>
-    </div>
-    <div class="search-results-item-article">
-        <div class="article-icon">
-            <img class="article-icon" src="{% static 'img/article-icon.png' %}"/>
-        </div>
-        <div class="article-listing">
-            <p>Title: New Wave Expose</p>
-            <p>Journal: Geology</p>
-            <p>doi:10.1037/arc0000014</p>
-            <p>Hirst, K.R. (1998). New Wave Expose.
-                <span class="journal-title">Geology</span>, 21(2), 100-103</p>
-            <p>20 incidences</p>
-        </div>
-    </div>
+    {% endfor %}
+
 </div>

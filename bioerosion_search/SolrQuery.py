@@ -16,7 +16,6 @@ class BioerosionSolrSearch:
     def __init__(self):
         self.solr_url = "%s/%s" % (SOLR_URL, SOLR_COLLECTION)
 
-
     def query_journal(self, query, search_type):
         if search_type == SearchType.NORMAL:
             return self.query_normal_journal(query)
@@ -25,7 +24,6 @@ class BioerosionSolrSearch:
 
     def query_normal_journal(self, query):
         s = solr.SolrConnection(self.solr_url)
-        # select = s.SearchHandler(s, "/collection1/select")
         response = s.query('text:%s' % query)
         results = response.results
         return_val = defaultdict()
@@ -49,5 +47,39 @@ class BioerosionSolrSearch:
                     return_val["unique_result_count"] += 1
                 else:
                     return_val[journal]["titles"][title] += 1
+
+        return return_val
+
+    def query_articles(self, journal, query, search_type):
+        if search_type == SearchType.NORMAL:
+            return self.query_normal_articles(journal, query)
+
+        return None
+
+    def query_normal_articles(self, journal, query):
+        s = solr.SolrConnection(self.solr_url)
+        response = s.query('text:%s AND journal:%s' % (query, journal))
+        results = response.results
+        return_val = defaultdict()
+        return_val['results'] = []
+
+        for r in results:
+            result = defaultdict()
+
+            journal = r['journal'][0]
+            title = r["title"][0]
+
+            if journal not in return_val:
+                return_val[journal] = defaultdict()
+
+            if title not in return_val[journal]:
+                return_val[journal][title] = 1
+                result['journal'] = journal
+                result['title'] = title
+                result['doi'] = r['doi']
+                result['citation'] = r['citation'][0]
+                return_val['results'].append(result)
+            else:
+                return_val[journal][title] += 1
 
         return return_val

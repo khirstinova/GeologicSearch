@@ -6,9 +6,11 @@ import logging
 
 logger = logging.getLogger(__name__)
 
+
 @login_required
 def index(request):
     return render_bioerosion_page(request, 'search/search.html')
+
 
 @login_required
 def search_ajax_journal(request):
@@ -18,3 +20,14 @@ def search_ajax_journal(request):
     search = BioerosionSolrSearch()
     journal_results = search.query_journal(term1, SearchType(int(search_type)))
     return render_bioerosion_page(request, "search/search_ajax_journal_level.html", {'results': journal_results})
+
+
+@login_required
+def search_ajax_article(request):
+
+    journal = request.GET.get('journal')
+    term1 = request.GET.get('term1')
+    search_type = request.GET.get('st')
+    search = BioerosionSolrSearch()
+    article_results = search.query_articles(journal, term1, SearchType(int(search_type)))
+    return render_bioerosion_page(request, "search/search_ajax_article_level.html", {'results_context': article_results})
