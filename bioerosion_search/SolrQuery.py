@@ -30,13 +30,24 @@ class BioerosionSolrSearch:
         results = response.results
         return_val = defaultdict()
         return_val["journals"] = []
+        return_val["journal_count"] = 0
+        return_val["unique_result_count"] = 0
 
         for r in results:
             journal = r["journal"][0]
+            title = r["title"][0]
             if journal not in return_val["journals"]:
                 return_val["journals"].append(journal)
-                return_val[journal] = 1
+                return_val[journal] = {"result_count": 1, "titles": defaultdict()}
+                return_val["journal_count"] += 1
+                return_val[journal][title] = 1
+                return_val["unique_result_count"] += 1
             else:
-                return_val[journal] += 1
+                if title not in return_val[journal]["titles"]:
+                    return_val[journal]["result_count"] += 1
+                    return_val[journal]["titles"][title] = 1
+                    return_val["unique_result_count"] += 1
+                else:
+                    return_val[journal]["titles"][title] += 1
 
         return return_val

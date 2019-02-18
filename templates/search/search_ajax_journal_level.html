@@ -5,11 +5,11 @@
         <img src="{% static 'img/export-icon.png' %}"/>
     </div>
     <h3>Results</h3>
-    <p>3 journals totaling 38 results</p>
+    <p>{{ results.journal_count }} journals totaling {{ results.unique_result_count }} results</p>
     {% for j in results.journals %}
     <div class="search-results-item-journal">
         <p><img src="{% static 'img/journal-icon.jpg' %}"/>
-            <a href="#">{{ j }}  - {{results|keyvalue:j}} result(s)</a>
+            <a href="#">{{ j }}  - {{ results|keyvalue:j|resultcount }} result(s)</a>
         </p>
     </div>
     {% endfor %}
