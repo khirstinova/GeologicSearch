@@ -11,10 +11,10 @@ def index(request):
     return render_bioerosion_page(request, 'search/search.html')
 
 @login_required
-def search_ajax(request):
+def search_ajax_journal(request):
 
     term1 = request.GET.get('term1')
     search_type = request.GET.get('st')
     search = BioerosionSolrSearch()
-    response = search.query(term1, SearchType(int(search_type)))
-    return JsonResponse(response, safe=False)
+    journal_results = search.query_journal(term1, SearchType(int(search_type)))
+    return render_bioerosion_page(request, "search/search_ajax_journal_level.html", {'results': journal_results})

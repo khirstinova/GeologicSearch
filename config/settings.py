@@ -109,7 +109,10 @@ TEMPLATES = [
             'loaders': [
                 "django.template.loaders.filesystem.Loader",
                 "django.template.loaders.app_directories.Loader",
-            ]
+            ],
+            'libraries':{
+                'dict_tags': 'templatetags.dict_tags',
+            },
         },
     },
 ]
