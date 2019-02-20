@@ -18,21 +18,21 @@
                     <form class="form-horizontal" method="post"{% if form.is_multipart %} enctype="multipart/form-data"{% endif %}>
                         <h3>Search</h3>
                         <p>&nbsp;</p>
-                        <p>Terms</p>
+                        <p>Phrases</p>
                         <p class="search_1">
-                            <input type="text" name="search_1" />
+                            <input type="text" id="search_1" name="search_1" />
                             <button data-next="2">Add Term</button>
                         </p>
                         <p class="search_2">
-                            <input type="text" name="search_2" />
+                            <input type="text" id="search_2" name="search_2" />
                             <button data-next="3">Add Term</button>
                             <span class="close">x</span>
                         </p>
                         <p class="search_3">
-                            <input type="text" name="search_3" />
+                            <input type="text" id="search_3" name="search_3" />
                             <span class="close">x</span>
                         </p>
-                        <p><select name="proximity" class="">
+                        <p><select id="proximity" name="proximity" class="">
                             <option value="0">None</option>
                             <option value="1">Next Word/Phrase</option>
                             <option value="2">Same Sentence</option>
@@ -49,7 +49,6 @@
                     <div class="search-results-container">
                         <div class="search-results-table">
                             <div id="search-ajax-container">
-                                {% include "search/search_ajax.html" %}
                             </div>
                             <div class="search-wait">
                                 <img src="{% static 'img/Loading_icon.gif' %}" />

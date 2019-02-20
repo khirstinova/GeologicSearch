@@ -15,6 +15,10 @@ label.col-sm-2 {
     max-width: 340px;
 }
 
+.form-input-error {
+    background-color: #ffae97 !important;
+}
+
 p.search_1, p.search_2, p.search_3 {
     background-color: #eee;
     padding: 8px;
@@ -35,8 +39,14 @@ p.search_2, p.search_3
     display: none;
 }
 
+.search-back {
+    display: inline-block;
+}
+
 .export-search-list {
+    display: inline-block;
     text-align: right;
+    width: 86%;
 }
 
 .search-results-table {
@@ -93,5 +103,6 @@ span.journal-title {
 
 .article-listing {
     display: inline-block;
+    max-width: 409px;
     padding-left: 8px;
 }

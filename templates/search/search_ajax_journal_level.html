@@ -9,7 +9,11 @@
     {% for j in results.journals %}
     <div class="search-results-item-journal">
         <p><img src="{% static 'img/journal-icon.jpg' %}"/>
-            <a href="#">{{ j }}  - {{ results|keyvalue:j|resultcount }} result(s)</a>
+            <a data-term1="{{ search_context.term1 }}" data-term2="{{ search_context.term2 }}"
+               data-term3="{{ search_context.term3 }}" data-st="{{ search_context.st }}"
+               data-journal="{{ j }}" href="#">
+                {{ j }}  - {{ results|keyvalue:j|resultcount }} result(s)
+            </a>
         </p>
     </div>
     {% endfor %}

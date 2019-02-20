@@ -1,6 +1,11 @@
 {% load pages_tags mezzanine_tags i18n staticfiles dict_tags %}
 
 <div class="search-results-list-articles">
+    <div class="search-back">
+        <a data-term1="{{ search_context.term1 }}" data-term2="{{ search_context.term2 }}"
+           data-term3="{{ search_context.term3 }}" data-st="{{ search_context.st }}"  class="journal-back-link"
+        href="#"><- Back</a>&nbsp;
+    </div>
     <div class="export-search-list">
         <img src="{% static 'img/export-icon.png' %}"/>
     </div>

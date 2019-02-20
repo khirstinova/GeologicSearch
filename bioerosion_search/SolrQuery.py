@@ -10,7 +10,6 @@ class SearchType(Enum):
     SENTENCE = 3
     PARAGRAPH = 4
 
-
 class BioerosionSolrSearch:
 
     def __init__(self):
@@ -24,7 +23,15 @@ class BioerosionSolrSearch:
 
     def query_normal_journal(self, query):
         s = solr.SolrConnection(self.solr_url)
-        response = s.query('text:%s' % query)
+
+        s_query = 'text:"%s"' % query['term1']
+        if 'term2' in query and query['term2']:
+            s_query += (' AND text:"%s"' % query['term2'])
+
+        if 'term3' in query and query['term3']:
+            s_query += (' AND text:"%s"' % query['term3'])
+
+        response = s.query(s_query)
         results = response.results
         return_val = defaultdict()
         return_val["journals"] = []
@@ -58,7 +65,16 @@ class BioerosionSolrSearch:
 
     def query_normal_articles(self, journal, query):
         s = solr.SolrConnection(self.solr_url)
-        response = s.query('text:%s AND journal:%s' % (query, journal))
+
+        s_query = 'text:"%s"' % query['term1']
+        if 'term2' in query and query['term2']:
+            s_query += (' AND text:"%s"' % query['term2'])
+
+        if 'term3' in query and query['term3']:
+            s_query += (' AND text:"%s"' % query['term3'])
+
+        s_query = '%s AND journal:%s' % (s_query, journal)
+        response = s.query(s_query)
         results = response.results
         return_val = defaultdict()
         return_val['results'] = []
