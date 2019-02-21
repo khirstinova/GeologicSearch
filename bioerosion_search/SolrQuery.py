@@ -16,13 +16,16 @@ class BioerosionSolrSearch:
         self.solr_url = "%s/%s" % (SOLR_URL, SOLR_COLLECTION)
 
     def query_journal(self, query, search_type):
-        if search_type == SearchType.NORMAL:
-            return self.query_normal_journal(query)
 
-        return None
-
-    def query_normal_journal(self, query):
         s = solr.SolrConnection(self.solr_url)
+
+        try:
+            response = self.journal_func_map[search_type.name](self, s, query)
+            return self.process_journal_results(response.results)
+        except KeyError:
+            return None
+
+    def query_journal_normal(self, conn, query):
 
         s_query = 'text:"%s"' % query['term1']
         if 'term2' in query and query['term2']:
@@ -31,8 +34,38 @@ class BioerosionSolrSearch:
         if 'term3' in query and query['term3']:
             s_query += (' AND text:"%s"' % query['term3'])
 
-        response = s.query(s_query)
-        results = response.results
+        return conn.query(s_query)
+
+    def query_journal_adjacent(self, conn, query):
+
+        s_query = self.get_proximity_queries(query, '3')
+        return conn.query(s_query)
+
+    def query_journal_sentence(self, conn, query):
+
+        s_query = self.get_proximity_queries(query, '20')
+        return conn.query(s_query)
+
+    def query_journal_paragraph(self, conn, query):
+
+        s_query = self.get_proximity_queries(query, '150')
+        return conn.query(s_query)
+
+    def get_proximity_queries(self, query, proximity):
+
+        if 'term3' not in query or not query['term3']:
+            if 'term2' not in query or not query['term2']:
+                # Perform normal single query
+                s_query = 'text:"%s"' % query['term1']
+            else:
+                s_query = 'text: "(\\"%s\\")(\\"%s\\")"~%s' % (query['term1'], query['term2'], proximity)
+        else:
+            s_query = 'text: "(\\"%s\\")(\\"%s\\")(\\"%s\\")"~%s' % \
+                      (query['term1'], query['term2'], query['term3'], proximity)
+
+        return s_query
+
+    def process_journal_results(self, results):
         return_val = defaultdict()
         return_val["journals"] = []
         return_val["journal_count"] = 0
@@ -57,14 +90,17 @@ class BioerosionSolrSearch:
 
         return return_val
 
-    def query_articles(self, journal, query, search_type):
-        if search_type == SearchType.NORMAL:
-            return self.query_normal_articles(journal, query)
+    def query_articles(self, query, search_type):
 
-        return None
-
-    def query_normal_articles(self, journal, query):
         s = solr.SolrConnection(self.solr_url)
+
+        try:
+            response = self.article_func_map[search_type.name](self, s, query)
+            return self.process_article_results(response.results)
+        except KeyError:
+            return None
+
+    def query_articles_normal(self, conn, query):
 
         s_query = 'text:"%s"' % query['term1']
         if 'term2' in query and query['term2']:
@@ -73,9 +109,28 @@ class BioerosionSolrSearch:
         if 'term3' in query and query['term3']:
             s_query += (' AND text:"%s"' % query['term3'])
 
-        s_query = '%s AND journal:%s' % (s_query, journal)
-        response = s.query(s_query)
-        results = response.results
+        s_query = '%s AND journal:%s' % (s_query, query['journal'])
+        return conn.query(s_query)
+
+    def query_articles_adjacent(self, conn, query):
+
+        s_query = self.get_proximity_queries(query, '3')
+        s_query = '%s AND journal:%s' % (s_query, query['journal'])
+        return conn.query(s_query)
+
+    def query_articles_sentence(self, conn, query):
+
+        s_query = self.get_proximity_queries(query, '20')
+        s_query = '%s AND journal:%s' % (s_query, query['journal'])
+        return conn.query(s_query)
+
+    def query_articles_paragraph(self, conn, query):
+
+        s_query = self.get_proximity_queries(query, '1500')
+        s_query = '%s AND journal:%s' % (s_query, query['journal'])
+        return conn.query(s_query)
+
+    def process_article_results(self, results):
         return_val = defaultdict()
         return_val['results'] = []
 
@@ -99,3 +154,17 @@ class BioerosionSolrSearch:
                 return_val[journal][title] += 1
 
         return return_val
+
+    journal_func_map = {
+        'NORMAL': query_journal_normal,
+        'ADJACENT': query_journal_adjacent,
+        'SENTENCE': query_journal_sentence,
+        'PARAGRAPH': query_journal_paragraph
+    }
+
+    article_func_map = {
+        'NORMAL': query_articles_normal,
+        'ADJACENT': query_articles_adjacent,
+        'SENTENCE': query_articles_sentence,
+        'PARAGRAPH': query_articles_paragraph
+    }

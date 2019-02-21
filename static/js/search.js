@@ -16,16 +16,7 @@ $(document).ready(
         (
             function(e) {
                 e.preventDefault();
-                let t1 = $('#search_1').val(), t2 = $('#search_2').val(), t3 = $('#search_3').val(),
-                    st = parseInt($('#proximity').val()) + 1, exp = false;
-                let valid = (t1 !== '');
-                if (valid)
-                {
-                    $('#search_1').parent().removeClass("form-input-error");
-                    search.performJournalSearch(t1, t2, t3, st, exp);
-                }
-                else
-                    $('#search_1').parent().addClass("form-input-error");
+                let valid = search.validateAndSubmitForm(true);
             }
         );
 
@@ -44,6 +35,8 @@ $(document).ready(
             $('button[data-next=' + number + ']').prop("disabled", false);
             $('.search_' + (number - 1)).find('.close').show();
             p.hide();
+
+            search.validateAndSubmitForm(false);
         });
     }
 );
@@ -138,5 +131,39 @@ var search = {
                 );
             }
         });
+    },
+
+    validateAndSubmitForm: function(submit) {
+
+        let t1 = $('#search_1').val(), t2 = $('#search_2').val(), t3 = $('#search_3').val(),
+                    st = parseInt($('#proximity').val()) + 1, exp = false;
+
+        let valid = (t1 !== '');
+
+        if (valid)
+        {
+            if (t3 !== '')
+                valid = (t2 !== '');
+
+            if (!valid)
+                $('#search_2').parent().addClass("form-input-error");
+        }
+        else
+        {
+            if (t3 !== '' && t2 === '')
+                $('#search_2').parent().addClass("form-input-error");
+            else
+                $('#search_2').parent().removeClass("form-input-error");
+
+            $('#search_1').parent().addClass("form-input-error");
+        }
+
+        if (valid) {
+            $('#search_1').parent().removeClass("form-input-error");
+            $('#search_2').parent().removeClass("form-input-error");
+
+            if (submit)
+                search.performJournalSearch(t1, t2, t3, st, exp);
+        }
     }
 }
