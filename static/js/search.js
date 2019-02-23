@@ -115,7 +115,6 @@ var search = {
             method: 'GET',
             url: article_search_url,
             success: function(data) {
-                console.log(data);
                 $('#search-ajax-container').html(data);
             },
             complete: function() {
