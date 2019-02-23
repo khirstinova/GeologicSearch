@@ -18,7 +18,7 @@
                 <p>Title: {{ r.title }}</p>
                 <p>Journal: {{ r.journal }}</p>
                 <p>{{ r.doi }}</p>
-                <p>{{ r.citation }}</p>
+                <p>{% autoescape off %}{{ r.citation }}{% endautoescape %}</p>
                 <p>{{ results_context|keyvalue:r.journal|keyvalue:r.title}} incidences</p>
             </div>
         </div>
