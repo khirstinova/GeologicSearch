@@ -65,7 +65,6 @@ var search = {
             method: 'GET',
             url: journal_search_url,
             success: function(data) {
-                console.log(data);
                 $('#search-ajax-container').html(data);
 
                 $('.search-results-item-journal a').click(

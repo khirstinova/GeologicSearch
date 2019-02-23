@@ -112,29 +112,38 @@ class SolrIngestor:
         section_solr_template['id'] = direct_children[0]['id']
         section_solr_template['content'] = direct_children[0]['item_text']
         section_solr_template['content_str'] = direct_children[0]['item_text']
-        print(section_solr_template)
+        self.documents.append(section_solr_template)
 
         for x in range(1, len(direct_children)):
             self.traverse_section(direct_children[x]['item'], prefix + "_" + str(x))
 
     def traverse_sections(self, root):
 
+        has_sections = False
         top_level_sections = root.findall("./body/sec")
 
         pos = 1
 
         for section in top_level_sections:
+            has_sections = True
             self.traverse_section(section, 'sec' + str(pos))
             pos = pos + 1
+
+        return has_sections
 
     def ingest(self, file):
 
         tree = ET.parse(file)
         root = tree.getroot()
+        self.documents = []
         self.current_solr_template = copy.deepcopy(self.solr_doc_template)
         self.populate_fields_and_citation(root)
-        root = etree.parse(file)
-        self.traverse_sections(root)
+        if self.traverse_sections(root):
+            self.solr_conn.add_many(self.documents, _commit=True)
+            abstract_entry = copy.deepcopy(self.current_solr_template)
+            abstract_entry['id'] = "%s_%s_%s" % (self.current_journal_id, self.current_article_id, 'abstract')
+            abstract_entry["abstract"] = self.current_abstract
+            self.solr_conn.add_many([abstract_entry], _commit=True)
 
     def __init__(self):
         solr_url = "%s/%s" % (SOLR_URL, SOLR_COLLECTION)
@@ -153,7 +162,7 @@ def main(args):
                 x = x + 1
                 print("Attempting to ingest %s" % filename)
                 ingestor.ingest(os.path.join(args.dir, filename))
-            if x > 1:
+            if x > 50:
                 break
 
 

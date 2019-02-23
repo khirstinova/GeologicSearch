@@ -109,7 +109,7 @@ class BioerosionSolrSearch:
         if 'term3' in query and query['term3']:
             s_query += (' AND text:"%s"' % query['term3'])
 
-        s_query = '%s AND journal:%s' % (s_query, query['journal'])
+        s_query = '%s AND journal:"%s"' % (s_query, query['journal'])
         return conn.query(s_query)
 
     def query_articles_adjacent(self, conn, query):
