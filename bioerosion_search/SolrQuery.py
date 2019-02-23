@@ -12,6 +12,8 @@ class SearchType(Enum):
 
 class BioerosionSolrSearch:
 
+    journal_facet_params = { 'facet': 'true', 'facet.field': 'journal_art_id', 'facet.limit': '-1'}
+
     def __init__(self):
         self.solr_url = "%s/%s" % (SOLR_URL, SOLR_COLLECTION)
 
@@ -21,7 +23,7 @@ class BioerosionSolrSearch:
 
         try:
             response = self.journal_func_map[search_type.name](self, s, query)
-            return self.process_journal_results(response.results)
+            return self.process_journal_results(response)
         except KeyError:
             return None
 
@@ -34,22 +36,22 @@ class BioerosionSolrSearch:
         if 'term3' in query and query['term3']:
             s_query += (' AND text:"%s"' % query['term3'])
 
-        return conn.query(s_query)
+        return conn.query(s_query, **self.journal_facet_params)
 
     def query_journal_adjacent(self, conn, query):
 
         s_query = self.get_proximity_queries(query, '3')
-        return conn.query(s_query)
+        return conn.query(s_query, **self.journal_facet_params)
 
     def query_journal_sentence(self, conn, query):
 
         s_query = self.get_proximity_queries(query, '20')
-        return conn.query(s_query)
+        return conn.query(s_query, **self.journal_facet_params)
 
     def query_journal_paragraph(self, conn, query):
 
         s_query = self.get_proximity_queries(query, '150')
-        return conn.query(s_query)
+        return conn.query(s_query, **self.journal_facet_params)
 
     def get_proximity_queries(self, query, proximity):
 
@@ -65,28 +67,33 @@ class BioerosionSolrSearch:
 
         return s_query
 
-    def process_journal_results(self, results):
+    def process_journal_results(self, response):
+        results = response.facet_counts
+
         return_val = defaultdict()
         return_val["journals"] = []
         return_val["journal_count"] = 0
         return_val["unique_result_count"] = 0
 
-        for r in results:
-            journal = r["journal"][0]
-            title = r["title"][0]
+        collection = results['facet_fields']['journal_art_id']
+
+        for key, value in collection.items():
+            return_val["unique_result_count"] += 1
+
+            values = key.split('---')
+            journal = values[0]
+            art_id = values[1]
             if journal not in return_val["journals"]:
                 return_val["journals"].append(journal)
                 return_val[journal] = {"result_count": 1, "titles": defaultdict()}
                 return_val["journal_count"] += 1
-                return_val[journal][title] = 1
-                return_val["unique_result_count"] += 1
+                return_val[journal][art_id] = value
             else:
-                if title not in return_val[journal]["titles"]:
+                if art_id not in return_val[journal]["titles"]:
                     return_val[journal]["result_count"] += 1
-                    return_val[journal]["titles"][title] = 1
-                    return_val["unique_result_count"] += 1
+                    return_val[journal]["titles"][art_id] = value
                 else:
-                    return_val[journal]["titles"][title] += 1
+                    return_val[journal]["titles"][art_id] = value
 
         return return_val
 

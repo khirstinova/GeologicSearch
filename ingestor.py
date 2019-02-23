@@ -20,10 +20,10 @@ class SolrIngestor:
         "title": "",
         "abstract": "",
         "author": "",
-        "author_s": "",
         "citation": "",
         "published": "",
         "journal": "",
+        "journal_art_id": "",
         "content": "",
         "content_str": "",
         "doi": "",
@@ -55,6 +55,8 @@ class SolrIngestor:
             self.find_and_get_text_single(root, "./front/journal-meta/journal-id[@journal-id-type='publisher-id']")
         self.current_article_id = \
             self.find_and_get_text_single(article_meta, ".//article-id[@pub-id-type='publisher-id']")
+        self.current_solr_template['journal_art_id'] = "%s---%s" % \
+                                                       (self.current_solr_template['journal'], self.current_article_id)
 
         if article_meta is not None:
             for author in article_meta.findall(".//contrib-group/contrib[@contrib-type='author']"):
@@ -64,7 +66,6 @@ class SolrIngestor:
 
         author_names = ", & ".join(author_names)
         self.current_solr_template['author'] = author_names
-        self.current_solr_template['author_s'] = author_names
 
         publish_element = article_meta.find(".//pub-date[@pub-type='ppub']")
 

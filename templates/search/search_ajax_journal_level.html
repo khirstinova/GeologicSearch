@@ -5,14 +5,14 @@
         <img src="{% static 'img/export-icon.png' %}"/>
     </div>
     <h3>Results</h3>
-    <p>{{ results.journal_count }} journals totaling {{ results.unique_result_count }} results</p>
+    <p>{{ results.journal_count }} journal(s) totaling {{ results.unique_result_count }} result(s)</p>
     {% for j in results.journals %}
     <div class="search-results-item-journal">
-        <p><img src="{% static 'img/journal-icon.jpg' %}"/>
-            <a data-term1="{{ search_context.term1 }}" data-term2="{{ search_context.term2 }}"
+        <p><img style="float:left; margin-right: 10px" src="{% static 'img/journal-icon.jpg' %}"/>
+            {{ j }}<br><a data-term1="{{ search_context.term1 }}" data-term2="{{ search_context.term2 }}"
                data-term3="{{ search_context.term3 }}" data-st="{{ search_context.st }}"
                data-journal="{{ j }}" href="#">
-                {{ j }}  - {{ results|keyvalue:j|resultcount }} result(s)
+                {{ results|keyvalue:j|resultcount }} result(s)
             </a>
         </p>
     </div>
