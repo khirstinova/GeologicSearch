@@ -1,5 +1,6 @@
 import argparse
 from config.settings import SOLR_COLLECTION, SOLR_URL
+from lxml import etree
 import copy
 import solr
 import os
@@ -45,10 +46,15 @@ class SolrIngestor:
             self.find_and_get_text_single(article_meta, ".//title-group/article-title")
         self.current_solr_template['doi'] \
             = self.find_and_get_text_single(article_meta, ".//article-id[@pub-id-type='doi']")
-        self.current_solr_template['abstract'] = self.find_and_get_text_single(article_meta, ".//abstract/p")
+        self.current_abstract = self.find_and_get_text_single(article_meta, ".//abstract/p")
 
         self.current_solr_template['journal'] = \
             self.find_and_get_text_single(root, "./front/journal-meta/journal-title-group/journal-title")
+
+        self.current_journal_id = \
+            self.find_and_get_text_single(root, "./front/journal-meta/journal-id[@journal-id-type='publisher-id']")
+        self.current_article_id = \
+            self.find_and_get_text_single(article_meta, ".//article-id[@pub-id-type='publisher-id']")
 
         if article_meta is not None:
             for author in article_meta.findall(".//contrib-group/contrib[@contrib-type='author']"):
@@ -77,9 +83,49 @@ class SolrIngestor:
         lpage = self.find_and_get_text_single(article_meta, ".//lpage")
         self.current_solr_template['citation'] = "%s, %s(%s), %s-%s" % (citation, volume, issue, fpage, lpage)
 
+
+    def get_child_sections(self, el, prefix):
+
+        return_val = []
+
+        text_collector = {'item_text': '', 'id': ''}
+        return_val.append(text_collector)
+        if 'id' not in el.attrib:
+            sec_id = prefix
+            text_collector['id'] = "%s_%s_%s" % (self.current_journal_id, self.current_article_id, sec_id)
+        else:
+            text_collector['id'] = "%s_%s_%s" % (self.current_journal_id, self.current_article_id, el.attrib['id'])
+
+        for item in el.findall('*'):
+            if item.tag == "sec":
+                it_str = ET.tostring(item).decode().replace(" xmlns:ns0=\"http://www.w3.org/1999/xlink\"", "")
+                return_val.append({'item': item, 'item_str': it_str})
+            else:
+                for text in item.itertext():
+                    text_collector['item_text'] += (" " + text.strip())
+
+        return return_val
+
+    def traverse_section(self, section, prefix):
+        direct_children = self.get_child_sections(section, prefix)
+        section_solr_template = copy.deepcopy(self.current_solr_template)
+        section_solr_template['id'] = direct_children[0]['id']
+        section_solr_template['content'] = direct_children[0]['item_text']
+        section_solr_template['content_str'] = direct_children[0]['item_text']
+        print(section_solr_template)
+
+        for x in range(1, len(direct_children)):
+            self.traverse_section(direct_children[x]['item'], prefix + "_" + str(x))
+
     def traverse_sections(self, root):
 
-        return None
+        top_level_sections = root.findall("./body/sec")
+
+        pos = 1
+
+        for section in top_level_sections:
+            self.traverse_section(section, 'sec' + str(pos))
+            pos = pos + 1
 
     def ingest(self, file):
 
@@ -87,7 +133,8 @@ class SolrIngestor:
         root = tree.getroot()
         self.current_solr_template = copy.deepcopy(self.solr_doc_template)
         self.populate_fields_and_citation(root)
-        print(self.current_solr_template)
+        root = etree.parse(file)
+        self.traverse_sections(root)
 
     def __init__(self):
         solr_url = "%s/%s" % (SOLR_URL, SOLR_COLLECTION)
@@ -106,7 +153,7 @@ def main(args):
                 x = x + 1
                 print("Attempting to ingest %s" % filename)
                 ingestor.ingest(os.path.join(args.dir, filename))
-            if (x > 12):
+            if x > 1:
                 break
 
 
