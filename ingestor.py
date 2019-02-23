@@ -140,6 +140,8 @@ class SolrIngestor:
         self.populate_fields_and_citation(root)
         if self.traverse_sections(root):
             self.solr_conn.add_many(self.documents, _commit=True)
+
+        if self.current_abstract:
             abstract_entry = copy.deepcopy(self.current_solr_template)
             abstract_entry['id'] = "%s_%s_%s" % (self.current_journal_id, self.current_article_id, 'abstract')
             abstract_entry["abstract"] = self.current_abstract
@@ -152,18 +154,14 @@ class SolrIngestor:
 
 def main(args):
 
-    x = 0
     ingestor = SolrIngestor()
 
     print("Scanning directory %s" % args.dir)
     if (os.path.isdir(args.dir)):
         for filename in os.listdir(args.dir):
             if (filename.endswith(".xml")):
-                x = x + 1
                 print("Attempting to ingest %s" % filename)
                 ingestor.ingest(os.path.join(args.dir, filename))
-            if x > 50:
-                break
 
 
 if __name__ == "__main__":
