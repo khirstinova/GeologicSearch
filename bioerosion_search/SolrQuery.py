@@ -12,7 +12,13 @@ class SearchType(Enum):
 
 class BioerosionSolrSearch:
 
-    journal_facet_params = { 'facet': 'true', 'facet.field': 'journal_art_id', 'facet.limit': '-1'}
+    journal_facet_params = {
+        'facet': 'true',
+        'facet.field':
+        'journal_art_id',
+        'facet.limit': '-1',
+        'facet.mincount': '1'
+    }
 
     def __init__(self):
         self.solr_url = "%s/%s" % (SOLR_URL, SOLR_COLLECTION)
@@ -78,22 +84,23 @@ class BioerosionSolrSearch:
         collection = results['facet_fields']['journal_art_id']
 
         for key, value in collection.items():
-            return_val["unique_result_count"] += 1
+            if value > 0:
+                return_val["unique_result_count"] += 1
 
-            values = key.split('---')
-            journal = values[0]
-            art_id = values[1]
-            if journal not in return_val["journals"]:
-                return_val["journals"].append(journal)
-                return_val[journal] = {"result_count": 1, "titles": defaultdict()}
-                return_val["journal_count"] += 1
-                return_val[journal][art_id] = value
-            else:
-                if art_id not in return_val[journal]["titles"]:
-                    return_val[journal]["result_count"] += 1
-                    return_val[journal]["titles"][art_id] = value
+                values = key.split('---')
+                journal = values[0]
+                art_id = values[1]
+                if journal not in return_val["journals"]:
+                    return_val["journals"].append(journal)
+                    return_val[journal] = {"result_count": 1, "titles": defaultdict()}
+                    return_val["journal_count"] += 1
+                    return_val[journal][art_id] = value
                 else:
-                    return_val[journal]["titles"][art_id] = value
+                    if art_id not in return_val[journal]["titles"]:
+                        return_val[journal]["result_count"] += 1
+                        return_val[journal]["titles"][art_id] = value
+                    else:
+                        return_val[journal]["titles"][art_id] = value
 
         return return_val
 
