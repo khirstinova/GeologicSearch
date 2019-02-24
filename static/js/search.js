@@ -43,7 +43,8 @@ $(document).ready(
 
 var search = {
 
-    searchUrlFormatArticle: "/search/search-ajax-article?term1=R1&term2=R2&term3=R3&st=R4&exp=R5&journal=R6",
+    page: 1,
+    searchUrlFormatArticle: "/search/search-ajax-article?term1=R1&term2=R2&term3=R3&st=R4&exp=R5&journal=R6&page=R7",
     searchUrlFormatJournal: "/search/search-ajax-journal?term1=R1&term2=R2&term3=R3&st=R4&exp=R5",
 
     performJournalSearch: function(term1, term2, term3, st, expand) {
@@ -97,7 +98,7 @@ var search = {
         search.performJournalSearch(term1, term2, term3, st, false);
     },
 
-    performArticleSearch: function(term1, term2, term3, st, expand, journal) {
+    performArticleSearch: function(term1, term2, term3, st, expand, journal, page) {
         $('.search-results-list-journals').hide();
         $('.search-wait').show();
 
@@ -108,7 +109,8 @@ var search = {
                 .replace("R3", encodeURIComponent(term3))
                 .replace("R4", encodeURIComponent(st))
                 .replace("R5", encodeURIComponent(expand))
-                .replace("R6", encodeURIComponent(journal));
+                .replace("R6", encodeURIComponent(journal))
+                .replace("R7", encodeURIComponent(journal));
 
         $.ajax({
             cache: false,

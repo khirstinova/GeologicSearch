@@ -1,6 +1,5 @@
 import argparse
 from config.settings import SOLR_COLLECTION, SOLR_URL
-from lxml import etree
 import copy
 import solr
 import os

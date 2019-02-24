@@ -1,6 +1,8 @@
+import copy
 import solr
 from config.settings import SOLR_COLLECTION, SOLR_URL
 from collections import defaultdict
+from django.core.cache import cache
 from enum import Enum
 
 
@@ -9,6 +11,7 @@ class SearchType(Enum):
     ADJACENT = 2
     SENTENCE = 3
     PARAGRAPH = 4
+
 
 class BioerosionSolrSearch:
 
@@ -109,12 +112,12 @@ class BioerosionSolrSearch:
         s = solr.SolrConnection(self.solr_url)
 
         try:
-            response = self.article_func_map[search_type.name](self, s, query)
-            return self.process_article_results(response.results)
+            response = self.article_func_map[search_type.name](self, s, query, self.journal_facet_params)
+            return self.process_article_results(response, query, search_type, True)
         except KeyError:
             return None
 
-    def query_articles_normal(self, conn, query):
+    def query_articles_normal(self, conn, query, params):
 
         s_query = 'text:"%s"' % query['term1']
         if 'term2' in query and query['term2']:
@@ -124,27 +127,44 @@ class BioerosionSolrSearch:
             s_query += (' AND text:"%s"' % query['term3'])
 
         s_query = '%s AND journal:"%s"' % (s_query, query['journal'])
-        return conn.query(s_query)
+        return conn.query(s_query, **params)
 
-    def query_articles_adjacent(self, conn, query):
+    def query_articles_adjacent(self, conn, query, params):
 
         s_query = self.get_proximity_queries(query, '3')
         s_query = '%s AND journal:%s' % (s_query, query['journal'])
-        return conn.query(s_query)
+        return conn.query(s_query, **params)
 
-    def query_articles_sentence(self, conn, query):
+    def query_articles_sentence(self, conn, query, params):
 
         s_query = self.get_proximity_queries(query, '20')
         s_query = '%s AND journal:%s' % (s_query, query['journal'])
-        return conn.query(s_query)
+        return conn.query(s_query, **params)
 
-    def query_articles_paragraph(self, conn, query):
+    def query_articles_paragraph(self, conn, query, params):
 
         s_query = self.get_proximity_queries(query, '1500')
         s_query = '%s AND journal:%s' % (s_query, query['journal'])
-        return conn.query(s_query)
+        return conn.query(s_query, params)
 
-    def process_article_results(self, results):
+    def sort_article_result_key(self, result):
+        return self.article_return_val[result['journal']][result['title']]
+
+    def process_article_results(self, response, query, search_type, initial):
+
+        # retrieve the whole thing
+        if initial:
+            num_found = response.numFound
+            cache_key = "%s_%s_%s_%s_%s" % \
+                        (query['term1'], query['term2'], query['term3'], search_type.name, query['journal'])
+            results = cache.get(cache_key)
+            if results is None:
+                s = solr.SolrConnection(self.solr_url)
+                params = {'start': '0', 'rows': str(num_found)}
+                response = self.article_func_map[search_type.name](self, s, query, params)
+                results = response.results
+                cache.set(cache_key, response.results, 600)
+
         return_val = defaultdict()
         return_val['results'] = []
 
@@ -167,6 +187,8 @@ class BioerosionSolrSearch:
             else:
                 return_val[journal][title] += 1
 
+        self.article_return_val = return_val
+        return_val['results'].sort(reverse=True, key=self.sort_article_result_key)
         return return_val
 
     journal_func_map = {
