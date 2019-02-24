@@ -87,7 +87,9 @@ var search = {
         let term1 = link.attr("data-term1"), term2 = link.attr("data-term2"),
             term3 = link.attr("data-term3"), st = link.attr("data-st"), journal = link.attr("data-journal");
 
-        search.performArticleSearch(term1, term2, term3, st, false, journal);
+        let page = 0;
+
+        search.performArticleSearch(term1, term2, term3, st, false, journal, page);
     },
 
     performJournalSearchLink: function(a) {
@@ -110,7 +112,7 @@ var search = {
                 .replace("R4", encodeURIComponent(st))
                 .replace("R5", encodeURIComponent(expand))
                 .replace("R6", encodeURIComponent(journal))
-                .replace("R7", encodeURIComponent(journal));
+                .replace("R7", encodeURIComponent(page));
 
         $.ajax({
             cache: false,

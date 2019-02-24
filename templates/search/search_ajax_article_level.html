@@ -6,6 +6,23 @@
            data-term3="{{ search_context.term3 }}" data-st="{{ search_context.st }}"  class="journal-back-link"
         href="#"><- Back</a>&nbsp;
     </div>
+    <div class="search-article-page">
+        <span>
+            {{ results_context.start }} to {{ results_context.end }} of {{ results_context.num_results }} article(s)
+        </span>
+        {% if results_context.num_pages > 1 %}
+        <span style="padding-left: 15px">
+            Go to page
+            <select id="article_page_select" style="display: inline-block">
+                {% with ''|center:results_context.num_pages as range %}
+                {% for _ in range %}
+                    <option value="{{ forloop.counter }}">{{ forloop.counter }}</option>
+                {% endfor %}
+                {% endwith %}
+            </select>
+        </span>
+        {% endif %}
+    </div>
     <div class="export-search-list">
         <img src="{% static 'img/export-icon.png' %}"/>
     </div>

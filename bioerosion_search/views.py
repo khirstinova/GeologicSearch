@@ -13,8 +13,12 @@ def get_search_context(request):
     term3 = request.GET.get('term3')
     search_type = request.GET.get('st')
     journal = request.GET.get('journal')
+    page = request.GET.get('page')
+    if not page:
+        page = '0'
 
-    search_context = {'term1': term1, 'term2': term2, 'term3': term3, 'st': search_type, 'journal': journal}
+    search_context = {'term1': term1, 'term2': term2, 'term3': term3, 'st': search_type, 'journal': journal,
+                      'page': page}
     return search_context
 
 @login_required

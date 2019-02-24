@@ -1,4 +1,5 @@
 import copy
+import math
 import solr
 from config.settings import SOLR_COLLECTION, SOLR_URL
 from collections import defaultdict
@@ -22,6 +23,8 @@ class BioerosionSolrSearch:
         'facet.limit': '-1',
         'facet.mincount': '1'
     }
+
+    results_per_page = 20
 
     def __init__(self):
         self.solr_url = "%s/%s" % (SOLR_URL, SOLR_COLLECTION)
@@ -164,7 +167,6 @@ class BioerosionSolrSearch:
                 response = self.article_func_map[search_type.name](self, s, query, params)
                 results = response.results
                 cache.set(cache_key, response.results, 600)
-
         return_val = defaultdict()
         return_val['results'] = []
 
@@ -189,6 +191,17 @@ class BioerosionSolrSearch:
 
         self.article_return_val = return_val
         return_val['results'].sort(reverse=True, key=self.sort_article_result_key)
+
+        # pagination
+        num_results = len(return_val['results'])
+        return_val['num_results'] = num_results
+        return_val['start'] = int(query['page']) * self.results_per_page + 1
+        return_val['num_pages'] = int(math.floor(num_results / self.results_per_page)) + 1
+        end_page = (int(query['page']) + 1) * self.results_per_page
+        end_page = end_page if end_page < num_results else num_results
+        return_val['end'] = end_page
+        return_val['results'] = return_val['results'][return_val['start'] - 1:end_page]
+
         return return_val
 
     journal_func_map = {
