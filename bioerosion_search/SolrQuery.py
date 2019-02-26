@@ -135,19 +135,19 @@ class BioerosionSolrSearch:
     def query_articles_adjacent(self, conn, query, params):
 
         s_query = self.get_proximity_queries(query, '3')
-        s_query = '%s AND journal:%s' % (s_query, query['journal'])
+        s_query = '%s AND journal:"%s"' % (s_query, query['journal'])
         return conn.query(s_query, **params)
 
     def query_articles_sentence(self, conn, query, params):
 
         s_query = self.get_proximity_queries(query, '20')
-        s_query = '%s AND journal:%s' % (s_query, query['journal'])
+        s_query = '%s AND journal:"%s"' % (s_query, query['journal'])
         return conn.query(s_query, **params)
 
     def query_articles_paragraph(self, conn, query, params):
 
         s_query = self.get_proximity_queries(query, '1500')
-        s_query = '%s AND journal:%s' % (s_query, query['journal'])
+        s_query = '%s AND journal:"%s"' % (s_query, query['journal'])
         return conn.query(s_query, params)
 
     def sort_article_result_key(self, result):
