@@ -117,7 +117,7 @@ class BioerosionSolrSearch:
         try:
             response = self.article_func_map[search_type.name](self, s, query, self.journal_facet_params)
             return self.process_article_results(response, query, search_type, True)
-        except KeyError:
+        except KeyError as k:
             return None
 
     def query_articles_normal(self, conn, query, params):
@@ -151,7 +151,7 @@ class BioerosionSolrSearch:
         return conn.query(s_query, params)
 
     def sort_article_result_key(self, result):
-        return self.article_return_val[result['journal']][result['title']]
+        return self.article_return_val[result['journal']][result['journal_art_id']]
 
     def process_article_results(self, response, query, search_type, initial):
 
@@ -174,20 +174,21 @@ class BioerosionSolrSearch:
             result = defaultdict()
 
             journal = r['journal'][0]
-            title = r["title"][0]
+            article_unique_key = r['journal_art_id']
 
             if journal not in return_val:
                 return_val[journal] = defaultdict()
 
-            if title not in return_val[journal]:
-                return_val[journal][title] = 1
+            if article_unique_key not in return_val[journal]:
+                return_val[journal][article_unique_key] = 1
                 result['journal'] = journal
-                result['title'] = title
+                result['title'] = r['title'][0]
+                result['journal_art_id'] = article_unique_key
                 result['doi'] = r['doi']
                 result['citation'] = r['citation'][0]
                 return_val['results'].append(result)
             else:
-                return_val[journal][title] += 1
+                return_val[journal][article_unique_key] += 1
 
         self.article_return_val = return_val
         return_val['results'].sort(reverse=True, key=self.sort_article_result_key)
@@ -195,8 +196,16 @@ class BioerosionSolrSearch:
         # pagination
         num_results = len(return_val['results'])
         return_val['num_results'] = num_results
+        return_val['page'] = int(query['page'])
+        # This is here because we can't perform math on the templare as part of output
+        return_val['previous_page'] = return_val['page'] - 1
+        return_val['next_page'] = return_val['page'] + 1
+
         return_val['start'] = int(query['page']) * self.results_per_page + 1
         return_val['num_pages'] = int(math.floor(num_results / self.results_per_page)) + 1
+        # This is ALSO here because we can't perform math on the templare as part of output
+        return_val['page_bound'] = return_val['num_pages'] - 1
+
         end_page = (int(query['page']) + 1) * self.results_per_page
         end_page = end_page if end_page < num_results else num_results
         return_val['end'] = end_page

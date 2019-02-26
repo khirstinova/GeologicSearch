@@ -45,13 +45,13 @@ p.search_2, p.search_3
 
 .search-article-page {
     display: inline-block;
-    padding-left: 21px;
+    padding-left: 18px;
 }
 
 .export-search-list {
     display: inline-block;
     text-align: right;
-    width: 23%;
+    width: 11%;
 }
 
 .search-results-table {
@@ -110,4 +110,8 @@ span.journal-title {
     display: inline-block;
     max-width: 409px;
     padding-left: 8px;
+}
+
+.article-page-link {
+    font-weight: bold;
 }

@@ -87,7 +87,9 @@ var search = {
         let term1 = link.attr("data-term1"), term2 = link.attr("data-term2"),
             term3 = link.attr("data-term3"), st = link.attr("data-st"), journal = link.attr("data-journal");
 
-        let page = 0;
+        let page = link.attr("data-page");
+        if (!page || page === "") page = "0";
+
 
         search.performArticleSearch(term1, term2, term3, st, false, journal, page);
     },
@@ -102,7 +104,9 @@ var search = {
 
     performArticleSearch: function(term1, term2, term3, st, expand, journal, page) {
         $('.search-results-list-journals').hide();
+        $('.search-results-list-articles').hide();
         $('.search-wait').show();
+        $('.search-results-container').show();
 
         let article_search_url =
             this.searchUrlFormatArticle
@@ -129,6 +133,23 @@ var search = {
                     function(e) {
                         e.preventDefault();
                         search.performJournalSearchLink(this);
+                    }
+                );
+
+                $('.article-page-link').click(
+                    function(e) {
+                        e.preventDefault();
+                        search.performArticleSearchLink(this);
+                    }
+                );
+
+                // Hack - find the link, click it.
+                $('#article_page_select').change(
+                    function(e) {
+                        e.preventDefault();
+                        let link = $('.article-page-link').first();
+                        link.attr('data-page', parseInt(this.value) - 1);
+                        link.click();
                     }
                 );
             }
