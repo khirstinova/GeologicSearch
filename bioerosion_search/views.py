@@ -113,9 +113,10 @@ def get_article_csv(results, search_context):
              + '\n'
     criteria = "\"'%s','%s'.'%s'\"" % (search_context['term1'], search_context['term2'], search_context['term3'])
     for r in results['results']:
-        line = "%s,%s,%s,%s,%s,\"%s\",%s" % (criteria, SearchType(int(search_context['st'])).name,
-                                             r['journal'], r['title'], r['doi'],
+        line = "%s,%s,\"%s\",\"%s\",\"%s\",\"%s\",%s" % (criteria, SearchType(int(search_context['st'])).name,
+                                             r['journal'], r['title'].replace("\"", "'"), r['doi'],
                                              r['citation'].replace("<span class=\"journal-title\">", "")
+                                             .replace("\"", "'")
                                              .replace("</span>", ""),
                                              results[r['journal']][r['journal_art_id']])
         output += (line + '\n')
