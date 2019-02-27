@@ -45,7 +45,9 @@
         {% endif %}
     </div>
     <div class="export-search-list">
-        <img src="{% static 'img/export-icon.png' %}"/>
+        <a target="_blank"
+           href="{{ search_context.csv_link_article }}">
+            <img src="{% static 'img/export-icon.png' %}"/></a>
     </div>
     {% for r in results_context.results %}
         <div class="search-results-item-article">

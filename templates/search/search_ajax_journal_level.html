@@ -2,7 +2,9 @@
 
 <div class="search-results-list-journals">
     <div class="export-search-list">
-        <img src="{% static 'img/export-icon.png' %}"/>
+        <a target="_blank"
+           href="{{ search_context.csv_link_journal }}">
+        <img src="{% static 'img/export-icon.png' %}" style="cursor: pointer;"/></a>
     </div>
     <h3>Results</h3>
     <p>{{ results.journal_count }} journal(s) totaling {{ results.unique_result_count }} result(s)</p>

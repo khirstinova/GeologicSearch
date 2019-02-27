@@ -45,9 +45,9 @@ var search = {
 
     page: 1,
     searchUrlFormatArticle: "/search/search-ajax-article?term1=R1&term2=R2&term3=R3&st=R4&exp=R5&journal=R6&page=R7",
-    searchUrlFormatJournal: "/search/search-ajax-journal?term1=R1&term2=R2&term3=R3&st=R4&exp=R5",
+    searchUrlFormatJournal: "/search/search-ajax-journal?term1=R1&term2=R2&term3=R3&st=R4&exp=R5&csv=R6",
 
-    performJournalSearch: function(term1, term2, term3, st, expand) {
+    performJournalSearch: function(term1, term2, term3, st, expand, csv) {
         $('.search-results-list-journals').hide();
         $('.search-results-list-articles').hide();
         $('.search-wait').show();
@@ -59,7 +59,8 @@ var search = {
                 .replace("R2", encodeURIComponent(term2))
                 .replace("R3", encodeURIComponent(term3))
                 .replace("R4", encodeURIComponent(st))
-                .replace("R5", encodeURIComponent(expand));
+                .replace("R5", encodeURIComponent(expand))
+                .replace("R6", encodeURIComponent(csv));
 
         $.ajax({
             cache: false,
@@ -99,7 +100,10 @@ var search = {
         let term1 = link.attr("data-term1"), term2 = link.attr("data-term2"),
             term3 = link.attr("data-term3"), st = link.attr("data-st");
 
-        search.performJournalSearch(term1, term2, term3, st, false);
+        let csv = link.attr("data-csv");
+        if (!csv || csv === "") csv = "";
+
+        search.performJournalSearch(term1, term2, term3, st, false, csv);
     },
 
     performArticleSearch: function(term1, term2, term3, st, expand, journal, page) {
@@ -186,7 +190,7 @@ var search = {
             $('#search_2').parent().removeClass("form-input-error");
 
             if (submit)
-                search.performJournalSearch(t1, t2, t3, st, exp);
+                search.performJournalSearch(t1, t2, t3, st, exp, '');
         }
     }
 }
