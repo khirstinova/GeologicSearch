@@ -17,6 +17,7 @@ class SearchType(Enum):
 class BioerosionSolrSearch:
 
     journal_facet_params = {
+        'score': 'false',
         'facet': 'true',
         'facet.field':
         'journal_art_id',
@@ -146,9 +147,9 @@ class BioerosionSolrSearch:
 
     def query_articles_paragraph(self, conn, query, params):
 
-        s_query = self.get_proximity_queries(query, '1500')
+        s_query = self.get_proximity_queries(query, '150')
         s_query = '%s AND journal:"%s"' % (s_query, query['journal'])
-        return conn.query(s_query, params)
+        return conn.query(s_query, **params)
 
     def sort_article_result_key(self, result):
         return self.article_return_val[result['journal']][result['journal_art_id']]
@@ -159,11 +160,12 @@ class BioerosionSolrSearch:
         if initial:
             num_found = response.numFound
             cache_key = "%s_%s_%s_%s_%s" % \
-                        (query['term1'], query['term2'], query['term3'], search_type.name, query['journal'])
+                        (query['term1'].replace(" ", "_"), query['term2'].replace(" ", "_"),
+                            query['term3'].replace(" ", "_"), search_type.name, query['journal'].replace(" ", "_"))
             results = cache.get(cache_key)
             if results is None:
                 s = solr.SolrConnection(self.solr_url)
-                params = {'start': '0', 'rows': str(num_found)}
+                params = {'start': '0', 'rows': str(num_found), 'score': 'false'}
                 response = self.article_func_map[search_type.name](self, s, query, params)
                 results = response.results
                 cache.set(cache_key, response.results, 600)
