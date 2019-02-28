@@ -17,6 +17,7 @@ class SolrIngestor:
         "id": "",
         "name": "",
         "title": "",
+        "article_title": "",
         "abstract": "",
         "author": "",
         "citation": "",
@@ -41,7 +42,7 @@ class SolrIngestor:
 
         article_meta = root.find("./front/article-meta")
 
-        self.current_solr_template['title'] = \
+        self.current_solr_template['article_title'] = \
             self.find_and_get_text_single(article_meta, ".//title-group/article-title")
         self.current_solr_template['doi'] \
             = self.find_and_get_text_single(article_meta, ".//article-id[@pub-id-type='doi']")
@@ -75,7 +76,7 @@ class SolrIngestor:
             self.current_solr_template['published'] = "%s-%s-%sT00:00:00Z" % (pub_year, pub_month, pub_day)
 
             citation = "%s (%s). %s. <span class=\"journal-title\">%s</span>" % \
-                (author_names, pub_year, self.current_solr_template['title'], self.current_solr_template['journal'])
+                (author_names, pub_year, self.current_solr_template['article_title'], self.current_solr_template['journal'])
 
         volume = self.find_and_get_text_single(article_meta, ".//volume")
         issue = self.find_and_get_text_single(article_meta, ".//issue")

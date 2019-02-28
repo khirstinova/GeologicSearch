@@ -168,7 +168,7 @@ class BioerosionSolrSearch:
             results = cache.get(cache_key)
             if results is None:
                 s = solr.SolrConnection(self.solr_url)
-                params = {'start': '0', 'rows': str(num_found), 'score': 'false'}
+                params = {'start': '0', 'rows': str(num_found)}
                 response = self.article_func_map[search_type.name](self, s, query, params)
                 results = response.results
                 cache.set(cache_key, response.results, 600)
@@ -187,7 +187,7 @@ class BioerosionSolrSearch:
             if article_unique_key not in return_val[journal]:
                 return_val[journal][article_unique_key] = 1
                 result['journal'] = journal
-                result['title'] = r['title'][0]
+                result['title'] = r['article_title']
                 result['journal_art_id'] = article_unique_key
                 result['doi'] = r['doi']
                 result['citation'] = r['citation'][0]
