@@ -100,6 +100,8 @@ class SolrIngestor:
             if item.tag == "sec":
                 it_str = ET.tostring(item).decode().replace(" xmlns:ns0=\"http://www.w3.org/1999/xlink\"", "")
                 return_val.append({'item': item, 'item_str': it_str})
+            elif item.tag == "title":
+                text_collector['title'] = item.text
             else:
                 for text in item.itertext():
                     text_collector['item_text'] += (" " + text.strip())
@@ -112,6 +114,7 @@ class SolrIngestor:
         section_solr_template['id'] = direct_children[0]['id']
         section_solr_template['content'] = direct_children[0]['item_text']
         section_solr_template['content_str'] = direct_children[0]['item_text']
+        section_solr_template['title'] = direct_children[0]['title']
         self.documents.append(section_solr_template)
 
         for x in range(1, len(direct_children)):
@@ -135,6 +138,16 @@ class SolrIngestor:
 
         tree = ET.parse(file)
         root = tree.getroot()
+
+        ppub = False
+        for node in root.findall("./front/article-meta/pub-date[@pub-type='ppub']"):
+            print("Found ppub element - ingesting")
+            ppub = True
+
+        if not ppub:
+            print("ppub element not found - not ingesting")
+            return None
+
         self.documents = []
         self.current_solr_template = copy.deepcopy(self.solr_doc_template)
         self.populate_fields_and_citation(root)

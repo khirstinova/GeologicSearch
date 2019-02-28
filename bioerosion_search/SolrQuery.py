@@ -74,9 +74,12 @@ class BioerosionSolrSearch:
                 s_query = 'text:"%s"' % query['term1']
             else:
                 s_query = 'text: "(\\"%s\\")(\\"%s\\")"~%s' % (query['term1'], query['term2'], proximity)
+                s_query += " AND text:\"%s\" AND text:\"%s\"" % (query['term1'], query['term2'])
         else:
             s_query = 'text: "(\\"%s\\")(\\"%s\\")(\\"%s\\")"~%s' % \
                       (query['term1'], query['term2'], query['term3'], proximity)
+            s_query += " AND text:\"%s\" AND text:\"%s\" AND text:\"%s\"" % \
+                       (query['term1'], query['term2'], query['term3'])
 
         return s_query
 
