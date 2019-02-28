@@ -114,7 +114,8 @@ class SolrIngestor:
         section_solr_template['id'] = direct_children[0]['id']
         section_solr_template['content'] = direct_children[0]['item_text']
         section_solr_template['content_str'] = direct_children[0]['item_text']
-        section_solr_template['title'] = direct_children[0]['title']
+        if 'title' in direct_children[0]:
+            section_solr_template['title'] = direct_children[0]['title']
         self.documents.append(section_solr_template)
 
         for x in range(1, len(direct_children)):
