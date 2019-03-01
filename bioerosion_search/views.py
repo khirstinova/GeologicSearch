@@ -72,11 +72,12 @@ def search_ajax_article(request):
     search_context = get_search_context(request)
 
     search = BioerosionSolrSearch()
-    article_results = search.query_articles(search_context, SearchType(int(search_context['st'])))
     if not search_context['csv']:
+        article_results = search.query_articles(search_context, SearchType(int(search_context['st'])), True)
         return render_bioerosion_page(request, "search/search_ajax_article_level.html",
                                   {'results_context': article_results, 'search_context': search_context})
     else:
+        article_results = search.query_articles(search_context, SearchType(int(search_context['st'])), False)
         return get_article_csv_reponse(article_results, search_context)
 
 
