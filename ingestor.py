@@ -1,6 +1,7 @@
 import argparse
 from config.settings import SOLR_COLLECTION, SOLR_URL
 import copy
+import re
 import solr
 import os
 import xml.etree.ElementTree as ET
@@ -71,6 +72,11 @@ class SolrIngestor:
 
         if publish_element is not None:
             pub_year = self.find_and_get_text_single(publish_element, ".//year")
+
+            # JGS < 2000 not ingested
+            if int(pub_year) < 2000 and self.current_solr_template['journal'] == 'Journal of the Geological Society':
+                return False
+
             pub_day = self.find_and_get_text_single(publish_element, ".//day")
             pub_month = self.find_and_get_text_single(publish_element, ".//month")
             self.current_solr_template['published'] = "%s-%s-%sT00:00:00Z" % (pub_year, pub_month, pub_day)
@@ -84,6 +90,7 @@ class SolrIngestor:
         lpage = self.find_and_get_text_single(article_meta, ".//lpage")
         self.current_solr_template['citation'] = "%s, %s(%s), %s-%s" % (citation, volume, issue, fpage, lpage)
 
+        return True
 
     def get_child_sections(self, el, prefix):
 
@@ -138,6 +145,18 @@ class SolrIngestor:
 
     def ingest(self, file):
 
+        with open(file, 'r', encoding="utf8") as content_file:
+            content = content_file.read()
+
+        content = re.sub(
+            r"xmlns\=\".*?\" ",
+            "", content
+        )
+
+        content_file = open(file, 'w', encoding="utf8")
+        content_file.write(content)
+        content_file.close()
+
         tree = ET.parse(file)
         root = tree.getroot()
 
@@ -152,15 +171,18 @@ class SolrIngestor:
 
         self.documents = []
         self.current_solr_template = copy.deepcopy(self.solr_doc_template)
-        self.populate_fields_and_citation(root)
-        if self.traverse_sections(root):
-            self.solr_conn.add_many(self.documents, _commit=True)
 
-        if self.current_abstract:
-            abstract_entry = copy.deepcopy(self.current_solr_template)
-            abstract_entry['id'] = "%s_%s_%s" % (self.current_journal_id, self.current_article_id, 'abstract')
-            abstract_entry["abstract"] = self.current_abstract
-            self.solr_conn.add_many([abstract_entry], _commit=True)
+        if self.populate_fields_and_citation(root):
+            if self.traverse_sections(root):
+                self.solr_conn.add_many(self.documents, _commit=True)
+
+            if self.current_abstract:
+                abstract_entry = copy.deepcopy(self.current_solr_template)
+                abstract_entry['id'] = "%s_%s_%s" % (self.current_journal_id, self.current_article_id, 'abstract')
+                abstract_entry["abstract"] = self.current_abstract
+                self.solr_conn.add_many([abstract_entry], _commit=True)
+        else:
+            print("Not ingesting due to proprietary conditions")
 
     def __init__(self):
         solr_url = "%s/%s" % (SOLR_URL, SOLR_COLLECTION)
