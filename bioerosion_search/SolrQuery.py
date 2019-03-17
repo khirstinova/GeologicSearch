@@ -26,6 +26,18 @@ class BioerosionSolrSearch:
         'facet.mincount': '1'
     }
 
+    journal_replacement_values = {
+        "PALAIOS": "Palaios",
+        "Bollettino della Società Geologica Italiana": "Italian Journal of Geosciences",
+        "Bollettino della Societa Geologica Italiana": "Italian Journal of Geosciences"
+    }
+
+    journal_add_values = {
+        "Palaios": ["PALAIOS"],
+        "Italian Journal of Geosciences": ["Bollettino della Società Geologica Italiana",
+                                           "Bollettino della Societa Geologica Italiana"]
+    }
+
     results_per_page = 20
 
     def __init__(self):
@@ -73,7 +85,7 @@ class BioerosionSolrSearch:
         s_query = 'text:"%s"' % query['term1']
 
         if 'journal' in query and query['journal']:
-            s_query = '%s AND journal:"%s"' % (s_query, query['journal'])
+            s_query = self.append_journal_query(s_query, query)
 
         solr_responses.append(conn.query(s_query, **params))
 
@@ -81,7 +93,7 @@ class BioerosionSolrSearch:
             s_query = 'text:"%s"' % query['term2']
 
             if 'journal' in query and query['journal']:
-                s_query = '%s AND journal:"%s"' % (s_query, query['journal'])
+                s_query = self.append_journal_query(s_query, query)
 
             solr_responses.append(conn.query(s_query, **params))
 
@@ -89,7 +101,7 @@ class BioerosionSolrSearch:
             s_query = 'text:"%s"' % query['term3']
 
             if 'journal' in query and query['journal']:
-                s_query = '%s AND journal:"%s"' % (s_query, query['journal'])
+                s_query = self.append_journal_query(s_query, query)
 
             solr_responses.append(conn.query(s_query, **params))
 
@@ -131,6 +143,10 @@ class BioerosionSolrSearch:
 
                 values = key.split('---')
                 journal = values[0]
+
+                if journal in self.journal_replacement_values:
+                    journal = self.journal_replacement_values[journal]
+
                 art_id = values[1]
                 if journal not in return_val["journals"]:
                     return_val["journals"].append(journal)
@@ -173,6 +189,16 @@ class BioerosionSolrSearch:
         except KeyError as k:
             return None
 
+    def append_journal_query(self, s_query, query):
+        s_query = '%s AND (journal:"%s"' % (s_query, query['journal'])
+
+        if query['journal'] in self.journal_add_values:
+            for j in self.journal_add_values[query['journal']]:
+                s_query += (' OR journal:"%s"' % j)
+
+        s_query += ')'
+        return s_query
+
     def query_articles_normal(self, conn, query, params):
 
         s_query = 'text:"%s"' % query['term1']
@@ -182,25 +208,25 @@ class BioerosionSolrSearch:
         if 'term3' in query and query['term3']:
             s_query += (' AND text:"%s"' % query['term3'])
 
-        s_query = '%s AND journal:"%s"' % (s_query, query['journal'])
+        s_query = self.append_journal_query(s_query, query)
         return conn.query(s_query, **params)
 
     def query_articles_adjacent(self, conn, query, params):
 
         s_query = self.get_proximity_queries(query, '3')
-        s_query = '%s AND journal:"%s"' % (s_query, query['journal'])
+        s_query = self.append_journal_query(s_query, query)
         return conn.query(s_query, **params)
 
     def query_articles_sentence(self, conn, query, params):
 
         s_query = self.get_proximity_queries(query, '20')
-        s_query = '%s AND journal:"%s"' % (s_query, query['journal'])
+        s_query = self.append_journal_query(s_query, query)
         return conn.query(s_query, **params)
 
     def query_articles_paragraph(self, conn, query, params):
 
         s_query = self.get_proximity_queries(query, '150')
-        s_query = '%s AND journal:"%s"' % (s_query, query['journal'])
+        s_query = self.append_journal_query(s_query, query)
         return conn.query(s_query, **params)
 
     def sort_article_result_key(self, result):
@@ -231,6 +257,8 @@ class BioerosionSolrSearch:
             result = defaultdict()
 
             journal = r['journal'][0]
+            if journal in self.journal_replacement_values:
+                journal = self.journal_replacement_values[journal]
             article_unique_key = r['journal_art_id']
 
             if journal not in return_val:
@@ -239,7 +267,7 @@ class BioerosionSolrSearch:
             if article_unique_key not in return_val[journal]:
                 return_val[journal][article_unique_key] = 1
                 result['journal'] = journal
-                result['title'] = r['article_title']
+                result['title'] = 'Title Not Available' if 'article_title' not in r else r['article_title']
                 result['journal_art_id'] = article_unique_key
                 result['doi'] = r['doi']
                 result['citation'] = r['citation'][0]

@@ -78,6 +78,7 @@ class SolrIngestor:
 
             pub_day = self.find_and_get_text_single(publish_element, ".//day")
             pub_month = self.find_and_get_text_single(publish_element, ".//month")
+            pub_day = "1" if pub_day == "" else pub_day
             self.current_solr_template['published'] = "%s-%s-%sT00:00:00Z" % (pub_year, pub_month, pub_day)
 
             citation = "%s (%s). %s. <span class=\"journal-title\">%s</span>" % \
