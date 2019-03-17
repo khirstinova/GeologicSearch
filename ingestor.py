@@ -26,7 +26,6 @@ class SolrIngestor:
         "journal": "",
         "journal_art_id": "",
         "content": "",
-        "content_str": "",
         "doi": "",
     }
 
@@ -121,7 +120,6 @@ class SolrIngestor:
         section_solr_template = copy.deepcopy(self.current_solr_template)
         section_solr_template['id'] = direct_children[0]['id']
         section_solr_template['content'] = direct_children[0]['item_text']
-        section_solr_template['content_str'] = direct_children[0]['item_text']
         if 'title' in direct_children[0]:
             section_solr_template['title'] = direct_children[0]['title']
         self.documents.append(section_solr_template)
@@ -148,14 +146,16 @@ class SolrIngestor:
         with open(file, 'r', encoding="utf8") as content_file:
             content = content_file.read()
 
-        content = re.sub(
-            r"xmlns\=\".*?\" ",
-            "", content
-        )
+        if "xmlns=\"" in content:
+            print ("Re-writing file without namespaces")
+            content = re.sub(
+                r"xmlns\=\".*?\" ",
+                "", content
+            )
 
-        content_file = open(file, 'w', encoding="utf8")
-        content_file.write(content)
-        content_file.close()
+            content_file = open(file, 'w', encoding="utf8")
+            content_file.write(content)
+            content_file.close()
 
         tree = ET.parse(file)
         root = tree.getroot()
@@ -174,7 +174,10 @@ class SolrIngestor:
 
         if self.populate_fields_and_citation(root):
             if self.traverse_sections(root):
+                print(str(len(self.documents)) + " documents to ingest")
                 self.solr_conn.add_many(self.documents, _commit=True)
+            else:
+                print("No documents to ingest?")
 
             if self.current_abstract:
                 abstract_entry = copy.deepcopy(self.current_solr_template)
@@ -197,9 +200,11 @@ def main(args):
     if (os.path.isdir(args.dir)):
         for filename in os.listdir(args.dir):
             if (filename.endswith(".xml")):
-                print("Attempting to ingest %s" % filename)
-                ingestor.ingest(os.path.join(args.dir, filename))
-
+                try:
+                    print("Attempting to ingest %s" % filename)
+                    ingestor.ingest(os.path.join(args.dir, filename))
+                except:
+                    print("ERROR with filename: " + filename)
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
