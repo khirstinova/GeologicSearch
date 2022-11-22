@@ -10,7 +10,7 @@ idna==2.8
 lxml
 Mezzanine==4.3.1
 oauthlib==2.1.0
-Pillow==5.4.0
+Pillow==9.3.0
 requests==2.21.0
 requests_oauthlib==1.0.0
 solrpy==0.9.9
