@@ -1,6 +1,6 @@
 beautifulsoup4==4.7.0
 bleach==3.0.2
-certifi==2018.11.29
+certifi==2022.12.7
 chardet==3.0.4
 Django==1.11.18
 filebrowser_safe==0.5.0
